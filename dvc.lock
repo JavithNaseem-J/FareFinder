@@ -26,16 +26,16 @@ stages:
     outs:
     - path: artifacts/data_ingestion
       hash: md5
-      md5: fd38fe4250b03a99358d09336ec134f9.dir
-      size: 17192085
+      md5: 1e9155ee7e4b77a7a881b5687091bc1e.dir
+      size: 17192089
       nfiles: 2
   data_validation:
     cmd: python main.py --stage data_validation
     deps:
     - path: artifacts/data_ingestion/flight-fare-data.csv
       hash: md5
-      md5: 749fd63d23e6ce8992e8e5690f612fc9
-      size: 14143853
+      md5: c747f79abc875908dce32110306c42a8
+      size: 14143857
     - path: config/config.yaml
       hash: md5
       md5: 77e7bb12d167b1cd5f50e649bdba0ba7
@@ -70,8 +70,8 @@ stages:
     deps:
     - path: artifacts/data_ingestion/flight-fare-data.csv
       hash: md5
-      md5: 749fd63d23e6ce8992e8e5690f612fc9
-      size: 14143853
+      md5: c747f79abc875908dce32110306c42a8
+      size: 14143857
     - path: config/config.yaml
       hash: md5
       md5: 77e7bb12d167b1cd5f50e649bdba0ba7
