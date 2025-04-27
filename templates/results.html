@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Fare Prediction Results</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border: 2px solid #006a4e; /* Bangladesh flag green */
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid #f42a41; /* Bangladesh flag red */
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            background-color: #f42a41; /* Bangladesh flag red */
+            border-radius: 50%;
+        }
+
+        h1 {
+            color: #006a4e; /* Bangladesh flag green */
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #555;
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+
+        .flag-colors {
+            display: flex;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+
+        .flag-colors div {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin: 0 5px;
+        }
+
+        .flag-green {
+            background-color: #006a4e;
+        }
+
+        .flag-red {
+            background-color: #f42a41;
+        }
+
+        .prediction {
+            text-align: center;
+            font-size: 2.5rem;
+            color: #006a4e; /* Bangladesh flag green */
+            margin: 2rem 0;
+            padding: 2rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 2px solid #f42a41; /* Bangladesh flag red */
+        }
+
+        .prediction-value {
+            font-weight: bold;
+        }
+
+        .details {
+            margin-top: 2rem;
+            padding: 1.5rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+        }
+
+        .details h2 {
+            margin-bottom: 1.5rem;
+            color: #006a4e; /* Bangladesh flag green */
+            font-size: 1.8rem;
+            border-bottom: 2px solid #f42a41; /* Bangladesh flag red */
+            padding-bottom: 0.5rem;
+        }
+
+        .details ul {
+            list-style: none;
+        }
+
+        .details li {
+            margin-bottom: 1rem;
+            color: #2c3e50;
+            font-size: 1.2rem;
+            padding: 0.8rem 0;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .details li:last-child {
+            border-bottom: none;
+        }
+
+        .details li strong {
+            display: inline-block;
+            width: 180px;
+            color: #006a4e; /* Bangladesh flag green */
+        }
+
+        .button-group {
+            margin-top: 2rem;
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .btn {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            font-weight: 500;
+        }
+
+        .back-btn {
+            background: #006a4e; /* Bangladesh flag green */
+        }
+
+        .back-btn:hover {
+            background: #004a35;
+            transform: translateY(-2px);
+        }
+
+        .print-btn {
+            background: #f42a41; /* Bangladesh flag red */
+        }
+
+        .print-btn:hover {
+            background: #d01b30;
+            transform: translateY(-2px);
+        }
+        
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+            padding-top: 1rem;
+            border-top: 1px solid #ddd;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                max-width: 100%;
+            }
+            .button-group {
+                display: none;
+            }
+            .prediction, .details {
+                border: 1px solid #ddd;
+            }
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            .container {
+                padding: 1rem;
+            }
+            .button-group {
+                flex-direction: column;
+            }
+            .prediction {
+                font-size: 2rem;
+                padding: 1.5rem;
+            }
+            .details li strong {
+                width: 140px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Bangladesh Flight Fare Prediction</h1>
+            <p class="subtitle">Your predicted flight fare results</p>
+            <div class="flag-colors">
+                <div class="flag-green"></div>
+                <div class="flag-red"></div>
+            </div>
+        </div>
+
+        <div class="prediction">
+            <div>Predicted Flight Fare</div>
+            <div class="prediction-value"> {{ "%.2f"|format(prediction) }}</div>
+        </div>
+
+        <div class="details">
+            <h2>Flight Details</h2>
+            <ul>
+                <li><strong>Airline:</strong> {{ input_data.Airline }}</li>
+                <li><strong>Source:</strong> {{ input_data.Source }}</li>
+                <li><strong>Destination:</strong> {{ input_data.Destination }}</li>
+                <li><strong>Departure Time:</strong> {{ input_data['Departure Time'] }}</li>
+                <li><strong>Arrival Time:</strong> {{ input_data['Arrival Time'] }}</li>
+                <li><strong>Stopovers:</strong> {{ input_data.Stopovers }}</li>
+                <li><strong>Class:</strong> {{ input_data.Class }}</li>
+                <li><strong>Booking Source:</strong> {{ input_data['Booking Source'] }}</li>
+                <li><strong>Days Before:</strong> {{ input_data['Days Before Departure'] }}</li>
+            </ul>
+        </div>
+
+        <div class="button-group">
+            <a href="/" class="btn back-btn">New Prediction</a>
+            <button onclick="window.print()" class="btn print-btn">Print Results</button>
+        </div>
+
+        
+    </div>
+
+    <script>
+        // Debug script to check URL parameters
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Results page loaded');
+            const urlParams = new URLSearchParams(window.location.search);
+            const prediction = urlParams.get('prediction');
+            const data = urlParams.get('data');
+            
+            console.log('Prediction from URL:', prediction);
+            console.log('Data from URL:', data);
+            
+            if (!prediction || !data) {
+                console.error('Missing required URL parameters');
+            }
+        });
+    </script>
+</body>
+</html>

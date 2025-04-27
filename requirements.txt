@@ -1,0 +1,24 @@
+pandas
+mlflow
+numpy
+scikit-learn
+matplotlib
+seaborn
+python-box
+pyYAML
+tqdm
+mlflow
+dagshub
+ensure
+joblib
+python-multipart
+types-PyYAML
+fastapi
+uvicorn
+dvc
+dvclive
+-e .
+
+
+
+

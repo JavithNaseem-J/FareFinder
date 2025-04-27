@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flight Fare Prediction</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            border: 2px solid #006a4e; /* Bangladesh flag green */
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid #f42a41; /* Bangladesh flag red */
+            position: relative;
+        }
+
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30px;
+            height: 30px;
+            background-color: #f42a41; /* Bangladesh flag red */
+            border-radius: 50%;
+        }
+
+        h1 {
+            color: #006a4e; /* Bangladesh flag green */
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            color: #555;
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+
+        .bengali-text {
+            font-family: 'Noto Sans Bengali', 'Segoe UI', sans-serif;
+            color: #444;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #34495e;
+            font-weight: 500;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #006a4e; /* Bangladesh flag green */
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        button {
+            display: block;
+            width: 100%;
+            padding: 1rem;
+            background: #006a4e; /* Bangladesh flag green */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #004a35;
+        }
+
+        .result {
+            margin-top: 2rem;
+            padding: 1rem;
+            border-radius: 5px;
+            text-align: center;
+            display: none;
+        }
+
+        .result.success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            display: block;
+        }
+
+        .result.error {
+            background: #ffebee;
+            color: #c62828;
+            display: block;
+        }
+
+        .validation-error {
+            color: #c62828;
+            font-size: 0.85rem;
+            margin-top: 0.3rem;
+            display: none;
+        }
+
+        .airport-info {
+            font-size: 0.8rem;
+            color: #777;
+            margin-top: 0.3rem;
+        }
+
+        .footer {
+            margin-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+            color: #666;
+            padding-top: 1rem;
+            border-top: 1px solid #ddd;
+        }
+
+        .flag-colors {
+            display: flex;
+            justify-content: center;
+            margin: 1rem 0;
+        }
+
+        .flag-colors div {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            margin: 0 5px;
+        }
+
+        .flag-green {
+            background-color: #006a4e;
+        }
+
+        .flag-red {
+            background-color: #f42a41;
+        }
+
+        .airport-map {
+            margin: 1rem 0;
+            padding: 1rem;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .airport-map img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        
+        #loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #006a4e;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Bangladesh Flight Fare Prediction</h1>
+            <p class="subtitle">Explore the best airfare prices across Bangladesh</p>
+            <div class="flag-colors">
+                <div class="flag-green"></div>
+                <div class="flag-red"></div>
+            </div>
+        </div>
+
+        <div class="airport-map">
+            <img src="/api/placeholder/600/300" alt="Bangladesh Airports Map">
+        </div>
+
+        <form id="predictionForm" action="/predict" method="post">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="airline">Airline</label>
+                    <select id="airline" name="Airline" required>
+                        <option value="">Select Airline</option>
+                        <option value="Biman Bangladesh Airlines">Biman Bangladesh Airlines</option>
+                        <option value="US-Bangla Airlines">US-Bangla Airlines</option>
+                        <option value="NovoAir">NovoAir</option>
+                        <option value="Air Astra">Air Astra</option>
+                        <option value="Malaysian Airlines">Malaysian Airlines</option>
+                        <option value="Cathay Pacific">Cathay Pacific</option>
+                        <option value="British Airways">British Airways</option>
+                        <option value="Singapore Airlines">Singapore Airlines</option>
+                        <option value="IndiGo">IndiGo</option>
+                        <option value="AirAsia">AirAsia</option>
+                        <option value="Etihad Airways">Etihad Airways</option>
+                        <option value="Gulf Air">Gulf Air</option>
+                        <option value="Emirates">Emirates</option>
+                        <option value="FlyDubai">FlyDubai</option>
+                        <option value="Saudia">Saudia</option>
+                        <option value="Thai Airways">Thai Airways</option>
+                        <option value="Kuwait Airways">Kuwait Airways</option>
+                        <option value="Air India">Air India</option>
+                        <option value="Qatar Airways">Qatar Airways</option>
+                        <option value="Air Arabia">Air Arabia</option>
+                        <option value="SriLankan Airlines">SriLankan Airlines</option>
+                        <option value="Vistara">Vistara</option>
+                        <option value="Lufthansa">Lufthansa</option>
+                        <option value="Turkish Airlines">Turkish Airlines</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="class">Class</label>
+                    <select id="class" name="Class" required>
+                        <option value="">Select Class</option>
+                        <option value="Economy">Economy</option>
+                        <option value="Business">Business</option>
+                        <option value="First Class">First Class</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="source_city">Source Airport</label>
+                    <select id="source_city" name="Source" required>
+                        <option value="">Select Source Airport</option>
+                        <option value="DAC">DAC - Hazrat Shahjalal Int'l Airport</option>
+                        <option value="CGP">CGP - Shah Amanat Int'l Airport</option>
+                        <option value="ZYL">ZYL - Osmani Int'l Airport</option>
+                        <option value="CXB">CXB - Cox's Bazar Airport</option>
+                        <option value="JSR">JSR - Jashore Airport</option>
+                        <option value="SPD">SPD - Saidpur Airport</option>
+                        <option value="RJH">RJH - Shah Makhdum Airport</option>
+                        <option value="BZL">BZL - Barisal Airport</option>
+                    </select>
+                    <p id="source_error" class="validation-error">Source and destination cannot be the same</p>
+                </div>
+                <div class="form-group">
+                    <label for="destination_city">Destination Airport</label>
+                    <select id="destination_city" name="Destination" required>
+                        <option value="">Select Destination Airport</option>
+                        <option value="DAC">DAC - Hazrat Shahjalal Int'l Airport</option>
+                        <option value="CGP">CGP - Shah Amanat Int'l Airport</option>
+                        <option value="ZYL">ZYL - Osmani Int'l Airport</option>
+                        <option value="CXB">CXB - Cox's Bazar Airport</option>
+                        <option value="JSR">JSR - Jashore Airport</option>
+                        <option value="SPD">SPD - Saidpur Airport</option>
+                        <option value="RJH">RJH - Shah Makhdum Airport</option>
+                        <option value="BZL">BZL - Barisal Airport</option>
+                        <option value="CCU">CCU - Netaji S.C. Bose Int'l Airport</option>
+                        <option value="DEL">DEL - Indira Gandhi Int'l Airport</option>
+                        <option value="KUL">KUL - Kuala Lumpur Int'l Airport</option>
+                        <option value="BKK">BKK - Suvarnabhumi Airport</option>
+                        <option value="SIN">SIN - Changi Airport, Singapore</option>
+                        <option value="DXB">DXB - Dubai Int'l Airport</option>
+                        <option value="DOH">DOH - Hamad Int'l Airport</option>
+                        <option value="JED">JED - King Abdulaziz Int'l Airport</option>
+                        <option value="LHR">LHR - Heathrow Airport, London</option>
+                        <option value="JFK">JFK - John F. Kennedy Int'l Airport</option>
+                        <option value="YYZ">YYZ - Toronto Pearson Int'l Airport</option>
+                        <option value="IST">IST - Istanbul Airport</option>
+                    </select>
+                    <p id="destination_error" class="validation-error">Source and destination cannot be the same</p>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="departure_time">Departure Time</label>
+                    <select id="departure_time" name="Departure Time" required>
+                        <option value="">Select Departure Time</option>
+                        <option value="Morning">Morning</option>
+                        <option value="Afternoon">Afternoon</option>
+                        <option value="Evening">Evening</option>
+                        <option value="Night">Night</option>
+                    </select>
+                    <p id="time_error" class="validation-error">Departure and arrival times cannot be the same</p>
+                </div>
+                <div class="form-group">
+                    <label for="arrival_time">Arrival Time</label>
+                    <select id="arrival_time" name="Arrival Time" required>
+                        <option value="">Select Arrival Time</option>
+                        <option value="Morning">Morning</option>
+                        <option value="Afternoon">Afternoon</option>
+                        <option value="Evening">Evening</option>
+                        <option value="Night">Night</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="stops">Stopovers</label>
+                    <select id="stops" name="Stopovers" required>
+                        <option value="">Select Stopovers</option>
+                        <option value="Direct">Direct</option>
+                        <option value="1 Stop">1 Stop</option>
+                        <option value="2 Stops">2 Stops</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="booking_source">Booking Source</label>
+                    <select id="booking_source" name="Booking Source" required>
+                        <option value="">Select Booking Source</option>
+                        <option value="Online Website">Online Website</option>
+                        <option value="Travel Agency">Travel Agency</option>
+                        <option value="Direct Booking">Direct Booking</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="days_before">Days Before Departure</label>
+                    <input type="number" id="days_before" name="Days Before Departure" min="1" max="60" required placeholder="Enter days (1-60)">
+                    <p id="days_error" class="validation-error">Please enter a value between 1 and 60 days</p>
+                </div>
+                <div class="form-group">
+                    <!-- Placeholder for balance -->
+                </div>
+            </div>
+
+            <button type="submit" id="submitBtn">Predict Fare</button>
+        </form>
+        
+        <div id="loading">
+            <div class="spinner"></div>
+            <p>Calculating fare prediction...</p>
+        </div>
+        
+        <div id="result" class="result"></div>
+
+        <div class="footer">
+            <p>Bangladesh Flight Fare Prediction Tool &copy; 2025</p>
+        </div>
+    </div>
+
+    <script>
+    // Form validation
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('predictionForm');
+    const sourceSelect = document.getElementById('source_city');  // Fixed typo: 'ource_city' -> 'source_city'
+    const destSelect = document.getElementById('destination_city');
+    const depTimeSelect = document.getElementById('departure_time');
+    const arrTimeSelect = document.getElementById('arrival_time');
+    const daysInput = document.getElementById('days_before');
+    const resultDiv = document.getElementById('result');
+    const loadingDiv = document.getElementById('loading');
+    
+    const sourceError = document.getElementById('source_error');
+    const destError = document.getElementById('destination_error');
+    const timeError = document.getElementById('time_error');
+    const daysError = document.getElementById('days_error');
+    
+    // Function to validate same airports
+    function validateAirports() {
+        if (sourceSelect.value && destSelect.value && sourceSelect.value === destSelect.value) {
+            sourceError.style.display = 'block';
+            destError.style.display = 'block';
+            return false;
+        } else {
+            sourceError.style.display = 'none';
+            destError.style.display = 'none';
+            return true;
+        }
+    }
+    
+    // Function to validate arrival/departure times
+    function validateTimes() {
+        if (depTimeSelect.value && arrTimeSelect.value && depTimeSelect.value === arrTimeSelect.value) {
+            timeError.style.display = 'block';
+            return false;
+        } else {
+            timeError.style.display = 'none';
+            return true;
+        }
+    }
+    
+    // Function to validate days before departure
+    function validateDays() {
+        const days = parseInt(daysInput.value);
+        if (isNaN(days) || days < 1 || days > 60) {
+            daysError.style.display = 'block';
+            return false;
+        } else {
+            daysError.style.display = 'none';
+            return true;
+        }
+    }
+    
+    // Add event listeners for real-time validation
+    sourceSelect.addEventListener('change', validateAirports);
+    destSelect.addEventListener('change', validateAirports);
+    depTimeSelect.addEventListener('change', validateTimes);
+    arrTimeSelect.addEventListener('change', validateTimes);
+    daysInput.addEventListener('input', validateDays);
+    
+    // Form submission with AJAX
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const isAirportsValid = validateAirports();
+        const isTimesValid = validateTimes();
+        const isDaysValid = validateDays();
+        
+        if (isAirportsValid && isTimesValid && isDaysValid) {
+            // Show loading spinner
+            loadingDiv.style.display = 'block';
+            resultDiv.style.display = 'none';
+            
+            // Get form data
+            const formData = new FormData(form);
+            
+            // Send AJAX request
+            fetch('/predict', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide loading spinner
+                loadingDiv.style.display = 'none';
+                
+                if (data.error) {
+                    // Show error message
+                    resultDiv.textContent = data.error;
+                    resultDiv.className = 'result error';
+                    resultDiv.style.display = 'block';
+                } else if (data.redirect) {
+                    // Handle the redirect manually for more control
+                    console.log('Redirect URL:', data.redirect);
+                    
+                    // Direct window location change
+                    window.location.href = data.redirect;
+                } else {
+                    // Fallback error handling for unexpected response
+                    resultDiv.textContent = 'Unexpected response format from server';
+                    resultDiv.className = 'result error';
+                    resultDiv.style.display = 'block';
+                    console.error('Unexpected response:', data);
+                }
+            })
+            .catch(error => {
+                // Hide loading spinner
+                loadingDiv.style.display = 'none';
+                
+                // Show error message
+                resultDiv.textContent = 'An error occurred. Please try again.';
+                resultDiv.className = 'result error';
+                resultDiv.style.display = 'block';
+                console.error('Error:', error);
+            });
+        }
+    });
+});
+    </script>
+</body>
+</html>
