@@ -12,7 +12,7 @@ class DataIngestionConfig:
 @dataclass(frozen=True)
 class DataValidationConfig:
     root_dir: Path
-    STATUS_FILE: str
+    status_file: str
     unzip_data_dir: Path
     all_schema: dict
 
@@ -21,7 +21,8 @@ class DataValidationConfig:
 class DataCleaningConfig:
     root_dir: Path
     input_data_path: Path
-    cleaned_file: Path 
+    cleaned_file: Path
+    file_status: str 
     columns_to_drop: list
     datetime_columns: list
     target_column_mapping: dict

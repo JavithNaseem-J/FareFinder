@@ -49,7 +49,21 @@ def run_stage(stage_name):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run specific pipeline stage.")
-    parser.add_argument("--stage", required=True, help="Name of the stage to run")
+    parser.add_argument("--stage", help="Name of the stage to run")
     args = parser.parse_args()
 
-    run_stage(args.stage)
+    if args.stage:
+        # If stage is provided, run that specific stage
+        run_stage(args.stage)
+    else:
+        # If no stage provided, run all stages sequentially
+        stages = [
+            "data_ingestion",
+            "data_validation",
+            "data_cleaning",
+            "data_transformation",
+            "model_training",
+            "model_evaluation",
+        ]
+        for stage in stages:
+            run_stage(stage)

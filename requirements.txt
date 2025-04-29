@@ -1,5 +1,4 @@
 pandas
-mlflow
 numpy
 scikit-learn
 matplotlib
@@ -11,12 +10,14 @@ mlflow
 dagshub
 ensure
 joblib
-python-multipart
+multipart
+boto3
 types-PyYAML
 fastapi
 uvicorn
 dvc
 dvclive
+dvc-s3
 -e .
 
 

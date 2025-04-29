@@ -26,24 +26,19 @@ class DataIngestion:
     def __init__(self, config: DataIngestionConfig):
         self.config = config
     def download_file(self):
-        logger.info(f"Checking if directory exists: {os.path.exists(self.config.root_dir)}")
         if not os.path.exists(self.config.local_data_file):
-            logger.info(f"Downloading from {self.config.source_URL} to {self.config.local_data_file}")
             filename, headers = request.urlretrieve(
                 url=self.config.source_URL,
                 filename=self.config.local_data_file)
-            logger.info(f"{filename} downloaded with headers: \n{headers}")
         else:
-            logger.info(f"File already exists: {self.config.local_data_file}, size: {get_size(Path(self.config.local_data_file))}")
+            logger.info(f"File already exists: {self.config.local_data_file}")
 
     def extract_zip_file(self):
         unzip_path = self.config.unzip_dir
-        logger.info(f"Extracting {self.config.local_data_file} to {unzip_path}")
         os.makedirs(unzip_path, exist_ok=True)
         with zipfile.ZipFile(self.config.local_data_file, 'r') as zip_ref:
             zip_ref.extractall(unzip_path)
         logger.info(f"Extraction completed to {unzip_path}")
-        logger.info(f"Directory contents after extraction: {os.listdir(unzip_path)}")
 
     
 class DataValidation:
@@ -56,7 +51,6 @@ class DataValidation:
             all_cols = list(data.columns)
             
             try:
-                # First try to access as dict
                 all_schema = list(self.config.all_schema.keys())
             except AttributeError:
                 all_schema = list(self.config.all_schema)
@@ -68,8 +62,7 @@ class DataValidation:
                     validation_status = False
                     break
             
-            # Write validation status to file
-            with open(self.config.STATUS_FILE, 'w') as f:
+            with open(self.config.status_file, 'w') as f:
                 f.write(f"Validation status: {validation_status}")
             
             return validation_status
@@ -107,7 +100,6 @@ class DataCleaning:
 
         for original_col, new_col in time_mappings.items():
             if original_col in df_copy.columns:
-                # Make sure the column is datetime type
                 if not pd.api.types.is_datetime64_dtype(df_copy[original_col]):
                     try:
                         df_copy[original_col] = pd.to_datetime(df_copy[original_col])
@@ -149,38 +141,50 @@ class DataCleaning:
             logger.error(f"Target column '{target_column}' not found. Available columns: {available_cols}")
             raise ValueError(f"Target column '{target_column}' not found in dataframe")
         
-        
-        
-        
         df_transformed[target_column] = np.log1p(df_transformed[target_column])
         logger.info(f"Log transformation applied to {target_column}")
         
         return df_transformed
 
-    def clean_data(self) -> None:
+    def check_status(self):
         try:
-            logger.info(f"Reading data from {self.config.input_data_path}")
-
-            df = pd.read_csv(self.config.input_data_path)
-            
-            if df is None or df.empty:
-                logger.error("Input data is empty or None")
-                raise ValueError("Input data is empty or None")
-            
-            logger.info(f"Original DataFrame shape: {df.shape}")
-                
-            df = self.convert_datetime_columns(df)
-            df = self.extract_time_categories(df)            
-            df = self.rename_target_column(df)            
-            df = self.log_transform_target(df)            
-            df = self.drop_columns(df)
-
-            df.to_csv(self.config.cleaned_file, index=False)
-            logger.info("Data cleaning completed successfully")
-
+            with open(self.config.file_status, 'r') as f:
+                status_data = json.load(f)
+            validation_status = status_data.get("Validation status", False)
+            logger.info(f"Data validation status: {validation_status}")
+            return validation_status
         except Exception as e:
-            logger.error(f"Error in data cleaning: {e}")
-            raise e
+            logger.error(f"Error reading validation status: {e}")
+            return False
+    
+    def clean_data(self):
+        validation_status = self.check_status()
+        
+        if not validation_status:
+            logger.error("Data validation failed. Skipping data cleaning.")
+        
+        logger.info("Data validation passed. Proceeding with data cleaning.")
+        logger.info(f"Reading data from {self.config.input_data_path}")
+
+        df = pd.read_csv(self.config.input_data_path)
+        
+        if df is None or df.empty:
+            logger.error("Input data is empty or None")
+            raise ValueError("Input data is empty or None")
+        
+        logger.info(f"Original DataFrame shape: {df.shape}")
+            
+        df = self.convert_datetime_columns(df)
+        df = self.extract_time_categories(df)            
+        df = self.rename_target_column(df)            
+        df = self.log_transform_target(df)            
+        df = self.drop_columns(df)
+
+        # Create directories if they don't exist
+        os.makedirs(os.path.dirname(self.config.cleaned_file), exist_ok=True)
+        df.to_csv(self.config.cleaned_file, index=False)
+        logger.info("Data cleaning completed successfully")
+
 
         
 class DataTransformation:

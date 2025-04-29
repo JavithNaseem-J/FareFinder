@@ -40,7 +40,7 @@ class ConfigurationManager:
         
         data_validation_config = DataValidationConfig(
             root_dir=config.root_dir,
-            STATUS_FILE=config.STATUS_FILE,
+            status_file=config.status_file,
             unzip_data_dir=config.unzip_data_dir,
             all_schema=schema,
         )
@@ -58,6 +58,7 @@ class ConfigurationManager:
             root_dir=config.root_dir,
             input_data_path=config.input_data,
             cleaned_file=config.cleaned_file,
+            file_status=config.file_status,
             columns_to_drop=schema.columns_to_drop,
             datetime_columns=schema.datetime_columns,
             target_column_mapping=schema.target_column_mapping

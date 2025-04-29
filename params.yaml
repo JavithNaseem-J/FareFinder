@@ -4,7 +4,7 @@ GradientBoostingRegressor:
     learning_rate: [0.01, 0.1, 0.2]
     max_depth: [3, 4, 5]
     min_samples_split: [2, 5, 10]
-    min_samples_leaf: [1, 2,4]
+    min_samples_leaf: [1,2,3,4]
     subsample: [0.6, 0.8, 1.0]
 
 

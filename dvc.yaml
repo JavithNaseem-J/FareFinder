@@ -20,7 +20,7 @@ stages:
       - schema.yaml
       - artifacts/data_ingestion/flight-fare-data.csv
     outs:
-      - artifacts/data_validation/status.txt
+      - artifacts/data_validation/status.json
 
   data_cleaning:
     cmd: python main.py --stage data_cleaning
@@ -32,6 +32,8 @@ stages:
       - config/config.yaml
       - schema.yaml
       - artifacts/data_ingestion/flight-fare-data.csv
+      - artifacts/data_validation/status.json
+      
     outs:
       - artifacts/data_cleaning/cleaned_flight_data.csv
 
