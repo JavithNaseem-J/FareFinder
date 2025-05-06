@@ -16,7 +16,8 @@ types-PyYAML
 fastapi
 uvicorn
 dvc
-dvclive
+ydata-profiling
+ipywidgets
 dvc-s3
 -e .
 
