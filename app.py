@@ -77,7 +77,6 @@ async def predict(
         print(f"Input DataFrame columns: {input_df.columns.tolist()}")
         print(f"Input DataFrame values: {input_df.iloc[0].tolist()}")
 
-        # Make prediction
         pipeline = PredictionPipeline()
         prediction = round(float(pipeline.predict(input_df)), 2)
         print(f"Prediction result: {prediction}")
@@ -102,17 +101,13 @@ async def show_results(request: Request, prediction: float = None, data: str = N
             print("Missing required parameters for results page")
             return RedirectResponse(url="/")
 
-        # Debug information
         print(f"Received prediction: {prediction}")
         print(f"Received data: {data}")
         
-        # Parse the JSON data
         input_data = json.loads(data)
         
-        # Debug: Print parsed data
         print(f"Parsed input_data: {input_data}")
         
-        # Render the template with the data
         return templates.TemplateResponse("results.html", {
             "request": request,
             "prediction": float(prediction),

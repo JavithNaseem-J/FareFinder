@@ -263,7 +263,6 @@ class DataTransformation:
             logger.info(f"Numerical columns: {list(numerical_columns)}")
             logger.info(f"Categorical columns: {list(categorical_columns)}")
 
-            # Preprocessing pipelines
             num_pipeline = Pipeline(steps=[
                 ("scaler", StandardScaler())
             ])
@@ -291,11 +290,9 @@ class DataTransformation:
             train_combined = np.hstack((train_processed, train_y))
             test_combined = np.hstack((test_processed, test_y))
 
-            # Save preprocessor using Path
             joblib.dump(preprocessor, self.config.preprocessor_path)
             logger.info(f"Preprocessor saved at {self.config.preprocessor_path}")
 
-            # Save processed data using Path
             np.save(Path(self.config.root_dir) / "train_processed.npy", train_combined)
             np.save(Path(self.config.root_dir) / "test_processed.npy", test_combined)
 
@@ -404,7 +401,6 @@ class ModelEvaluation:
             if not Path(self.config.model_path).exists():
                 raise FileNotFoundError(f"Model file not found at {self.config.model_path}")
 
-                    # Load preprocessor and model
             logger.info("Loading preprocessor and model...")
             preprocessor = joblib.load(self.config.preprocessor_path)
             model = joblib.load(self.config.model_path)
@@ -447,7 +443,6 @@ class ModelEvaluation:
             logger.info(metrics)
 
 
-            # Save and log metrics
             metrics_file = Path(self.config.root_dir) / "metrics.json"
             with open(metrics_file, 'w') as f:
                 json.dump(metrics, f)

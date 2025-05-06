@@ -18,12 +18,10 @@ class PredictionPipeline:
         self.model_path = Path('artifacts/model_trainer/model.joblib')
         self.label_encoders_path = Path('artifacts/data_transformation/label_encoders.pkl')
 
-        # Validate artifact files
         for path in [self.preprocessor_path, self.model_path, self.label_encoders_path]:
             if not path.exists():
                 raise FileNotFoundError(f"Required artifact not found: {path}")
 
-        # Load artifacts
         self.preprocessor = joblib.load(self.preprocessor_path)
         self.model = joblib.load(self.model_path)
         self.label_encoders = joblib.load(self.label_encoders_path)
