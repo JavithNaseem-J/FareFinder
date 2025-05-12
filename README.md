@@ -71,8 +71,8 @@ Prediction API →Docker Containerization → CI/CD → AWS ECR Deployment
 ### 🔹 Clone the repository
 
 ```bash
-git clone https://github.com/your-username/flight-fare-price-prediction.git
-cd flight-fare-price-prediction
+git clone https://github.com/JavithNaseem-J/FareFinder.git
+cd FareFinder
 ```
 
 ### 🔹 Create & activate virtual environment
