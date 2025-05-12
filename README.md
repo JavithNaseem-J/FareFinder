@@ -33,7 +33,7 @@ Prediction API →Docker Containerization → CI/CD → AWS ECR Deployment
 
 | Category        | Tools Used                                |
 | --------------- | ----------------------------------------- |
-| Language        | Python 3.11                               |
+| Language        | Python 3.10                               |
 | ML Framework    | Scikit-learn, XGBoost                     |
 | Experimentation | MLflow + Dagshub                          |
 | Versioning      | DVC                                       |
