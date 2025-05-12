@@ -6,6 +6,7 @@ import numpy as np
 import zipfile
 import joblib
 import json
+import gdown
 import mlflow
 import mlflow.sklearn
 import dagshub
@@ -25,20 +26,20 @@ from mlproject.entities.config_entity import DataIngestionConfig, DataValidation
 class DataIngestion:
     def __init__(self, config: DataIngestionConfig):
         self.config = config
+
     def download_file(self):
         if not os.path.exists(self.config.local_data_file):
-            filename, headers = request.urlretrieve(
-                url=self.config.source_URL,
-                filename=self.config.local_data_file)
+            gdown.download(id=self.config.source_id, output=self.config.local_data_file, quiet=False)
+            print(f"[INFO] Downloaded file: {self.config.local_data_file}")
         else:
-            logger.info(f"File already exists: {self.config.local_data_file}")
+            print(f"[INFO] File already exists: {self.config.local_data_file} ({get_size(Path(self.config.local_data_file))})")
 
     def extract_zip_file(self):
-        unzip_path = self.config.unzip_dir
-        os.makedirs(unzip_path, exist_ok=True)
+        unzip_dir = self.config.unzip_dir
+        os.makedirs(unzip_dir, exist_ok=True)
         with zipfile.ZipFile(self.config.local_data_file, 'r') as zip_ref:
-            zip_ref.extractall(unzip_path)
-        logger.info(f"Extraction completed to {unzip_path}")
+            zip_ref.extractall(unzip_dir)
+            print(f"[INFO] Extracted files to: {unzip_dir}")
 
     
 class DataValidation:
@@ -307,9 +308,9 @@ class DataTransformation:
 class ModelTrainer:
     def __init__(self, config: ModelTrainerConfig):
         self.config = config
-        dagshub.init(repo_owner="JavithNaseem-J", repo_name="Flight-Fare-Price-Prediction")
-        mlflow.set_tracking_uri("https://dagshub.com/JavithNaseem-J/Flight-Fare-Price-Prediction.mlflow")
-        mlflow.set_experiment("Flight-Fare-Price-Prediction")
+        dagshub.init(repo_owner="JavithNaseem-J", repo_name="FareFinder")
+        mlflow.set_tracking_uri("https://dagshub.com/JavithNaseem-J/FareFinder.mlflow")
+        mlflow.set_experiment("Fare-Price-Prediction")
 
     def train(self):
         # Validate file paths

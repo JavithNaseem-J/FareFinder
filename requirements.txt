@@ -16,6 +16,7 @@ types-PyYAML
 fastapi
 uvicorn
 dvc
+gdown
 ydata-profiling
 ipywidgets
 dvc-s3
